@@ -9,41 +9,59 @@ const KeywordOutput = ({ formattedKeywords, matchType, caseType }) => {
 
 const copyToClipboard = async () => {
     try {
-      // Check if the modern Clipboard API is available
+      // First try to use the modern Clipboard API with proper permission checking
       if (navigator.clipboard && window.isSecureContext) {
-        // Use the modern Clipboard API
-        await navigator.clipboard.writeText(formattedKeywords)
+        try {
+          // Check clipboard permissions if available
+          if (navigator.permissions) {
+            const permission = await navigator.permissions.query({ name: 'clipboard-write' })
+            if (permission.state === 'denied') {
+              throw new Error('Clipboard permission denied')
+            }
+          }
+          
+          // Use the modern Clipboard API
+          await navigator.clipboard.writeText(formattedKeywords)
+          setCopied(true)
+          toast.success('Keywords copied to clipboard!')
+          setTimeout(() => setCopied(false), 2000)
+          return
+        } catch (clipboardError) {
+          // If clipboard API fails (permissions, etc.), fall back to execCommand
+          if (clipboardError.name === 'NotAllowedError' || clipboardError.message.includes('permission')) {
+            console.warn('Clipboard API blocked, falling back to execCommand')
+          } else {
+            throw clipboardError
+          }
+        }
+      }
+      
+      // Fallback to the older document.execCommand method
+      const textArea = document.createElement('textarea')
+      textArea.value = formattedKeywords
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+      
+      const successful = document.execCommand('copy')
+      document.body.removeChild(textArea)
+      
+      if (successful) {
         setCopied(true)
         toast.success('Keywords copied to clipboard!')
         setTimeout(() => setCopied(false), 2000)
       } else {
-        // Fallback to the older document.execCommand method
-        const textArea = document.createElement('textarea')
-        textArea.value = formattedKeywords
-        textArea.style.position = 'fixed'
-        textArea.style.left = '-999999px'
-        textArea.style.top = '-999999px'
-        document.body.appendChild(textArea)
-        textArea.focus()
-        textArea.select()
-        
-        const successful = document.execCommand('copy')
-        document.body.removeChild(textArea)
-        
-        if (successful) {
-          setCopied(true)
-          toast.success('Keywords copied to clipboard!')
-          setTimeout(() => setCopied(false), 2000)
-        } else {
-          throw new Error('execCommand failed')
-        }
+        throw new Error('execCommand failed')
       }
     } catch (err) {
       console.error('Copy to clipboard failed:', err)
       
       // Provide specific error messages based on the error type
       if (err.name === 'NotAllowedError') {
-        toast.error('Clipboard access denied. Please allow clipboard permissions.')
+        toast.error('Clipboard access denied. Please allow clipboard permissions or copy manually.')
       } else if (err.name === 'NotSupportedError') {
         toast.error('Clipboard not supported in this browser.')
       } else if (!window.isSecureContext) {
