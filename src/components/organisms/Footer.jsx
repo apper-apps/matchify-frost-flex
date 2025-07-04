@@ -35,7 +35,7 @@ const Footer = () => {
         
         <div className="mt-8 pt-8 border-t border-surface-700 text-center text-sm text-surface-400">
           <p>
-            © 2024 Matchify. Built for PPC professionals who value speed and simplicity.
+            © 2025 Matchify by <a hrefs="https://upgraded.id">Upgraded.id</a>. Built for PPC professionals who value speed and simplicity.
           </p>
         </div>
       </div>
