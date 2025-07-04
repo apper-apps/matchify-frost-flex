@@ -33,9 +33,9 @@ const Footer = () => {
           </div>
         </motion.div>
         
-        <div className="mt-8 pt-8 border-t border-surface-700 text-center text-sm text-surface-400">
+<div className="mt-8 pt-8 border-t border-surface-700 text-center text-sm text-surface-400">
           <p>
-            © 2025 Matchify by <a hrefs="https://upgraded.id">Upgraded.id</a>. Built for PPC professionals who value speed and simplicity.
+            © 2025 Matchify by <a href="https://upgraded.id" target="_blank" rel="noopener noreferrer" className="text-primary-400 hover:text-primary-300 transition-colors duration-200 underline decoration-primary-400/50 hover:decoration-primary-300">Upgraded.id</a>. Built for PPC professionals who value speed and simplicity.
           </p>
         </div>
       </div>
